@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 
 from setuptools import setup, find_packages
+import os
 
 def get_version(relpath):
   """Read version info from a file without importing it"""
@@ -24,7 +25,8 @@ setup(
     packages=find_packages(),
     version=VERSION,
     description="Pokédex CLI",
-    #long_description=README,
+    long_description=open("README_PYPI.rst").read() if os.path.exists("README_PYPI.rst") else "",
+    long_description_content_type='text/x-rst',  # Specify the format of the long description
     author="Tenchi",
     author_email="tenkage@gmail.com",
     url="https://github.com/Tenchi2xh/pokedex-cli",
@@ -32,6 +34,7 @@ setup(
     keywords=["pokedex", "pokemon", "terminal", "cli"],
     classifiers=[
         "Development Status :: 4 - Beta",
+        "Programming Language :: Python :: 3",  # Update to Python 3
         "Programming Language :: Python :: 2.7"
     ],
     install_requires=["Pillow", "requests", "progressbar2", "click"],
@@ -44,6 +47,6 @@ setup(
         ]
     },
     package_data={
-        "pokedex": ["resources/icons/*.png"] 
+        "pokedex": ["resources/icons/*.png", "resources/*.png"]  # Ensure all necessary resources are included
     }
 )
