@@ -11,9 +11,34 @@ The Pocket Monster Index, now in your terminal!
 
 ## Installation
 
+### Using pip directly from GitHub
+
+You can install the application directly from GitHub using pip:
+
 ```
 pip install "git+https://github.com/Tenchi2xh/pokedex-cli.git@v0.1.4#egg=pokedex-cli"
 ```
+
+### Using requirements.txt
+
+Alternatively, you can clone the repository and install the required dependencies:
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Tenchi2xh/pokedex-cli.git
+   cd pokedex-cli
+   ```
+
+2. Install the required system dependencies (for Ubuntu/Debian):
+   ```bash
+   sudo apt-get update
+   sudo apt-get install -y python3-dev python3-pip libjpeg-dev zlib1g-dev
+   ```
+
+3. Install the Python dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
 For the best output quality, please adjust the vertical line spacing in your terminal emulator until the block characters connect.
 

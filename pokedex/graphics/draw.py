@@ -99,7 +99,7 @@ def draw_image(buffer, path, x0=0, y0=0):
     new_size = (int(image.width * ratio), int(image.height * ratio))
     
     # Resize dengan nearest neighbor untuk mempertahankan ketajaman pixel art
-    image = image.resize(new_size, Image.Resampling.NEAREST)
+    image = image.resize(new_size, Image.NEAREST)
     
     pixels = image.load()
     width, height = image.size
