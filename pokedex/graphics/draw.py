@@ -68,34 +68,67 @@ type_colors = {
 }
 
 
+def clean_sprite(image):
+    """Clean up sprite by removing stray black pixels and improving contrast"""
+    pixels = image.load()
+    width, height = image.size
+    
+    # Convert black pixels that are surrounded by non-black to background
+    for y in range(1, height-1):
+        for x in range(1, width-1):
+            current = pixels[x, y]
+            if current[0] < 30 and current[1] < 30 and current[2] < 30:  # If pixel is very dark
+                neighbors = [
+                    pixels[x-1, y], pixels[x+1, y],
+                    pixels[x, y-1], pixels[x, y+1]
+                ]
+                # If surrounded by non-black pixels, convert to background
+                if all(n[0] > 30 or n[1] > 30 or n[2] > 30 for n in neighbors):
+                    pixels[x, y] = (40, 40, 40)  # Dark grey instead of pure black
+    
+    return image
+
 def draw_image(buffer, path, x0=0, y0=0):
     image = Image.open(path).convert("RGB")
+    
+    # Ukuran standar untuk sprite Let's Go
+    max_size = 32  # Tetap gunakan 32 untuk tampilan di terminal
+    
+    # Hitung rasio untuk scaling sambil mempertahankan aspek ratio
+    ratio = min(max_size / image.width, max_size / image.height)
+    new_size = (int(image.width * ratio), int(image.height * ratio))
+    
+    # Resize dengan nearest neighbor untuk mempertahankan ketajaman pixel art
+    image = image.resize(new_size, Image.Resampling.NEAREST)
+    
     pixels = image.load()
     width, height = image.size
 
+    # Center the image vertically
+    y_offset = (max_size - height) // 2
+    
     for y in range(0, height, 2):
         for x in range(width):
-            if x + x0 < buffer.width and y + y0 < buffer.height * 2:
+            if x + x0 < buffer.width and y + y0 + y_offset < buffer.height * 2:
                 color_top = rgb_to_xterm(pixels[x, y])
-                color_bottom = rgb_to_xterm(pixels[x, y + 1])
+                color_bottom = rgb_to_xterm(pixels[x, y + 1]) if y + 1 < height else 0
+                buffer.put_cell((x0 + x, (y0 + y + y_offset) // 2), u"▀", color_top, color_bottom)
 
-                buffer.put_cell((x0 + x, (y0 + y) // 2), u"▀", color_top, color_bottom)
 
-
-def draw_number(buffer, number, x0=0, y0=0, fg=15, bg=-1):
+def draw_number(buffer, number, x0=0, y0=0, fg=15):
     chars = "#%03d" % number
     for i, char in enumerate(chars):
         template = numbers[char]
         for x in range(3):
             for y in range(3):
-                buffer.put_cell((x0 + (i*3) + x, y0 + y), template[y][x], fg, bg)
+                buffer.put_cell((x0 + (i*3) + x, y0 + y), template[y][x], fg)
 
 
-def draw_type(buffer, type1, type2=None, x0=0, y0=0):
-    buffer.put_line((x0, y0), " %s " % type1.upper(), fg=0, bg=type_colors[type1.lower()])
-    if type2:
-        buffer.put_line((x0 + len(type1) + 3, y0), " %s " % type2.upper(), fg=0, bg=type_colors[type2.lower()])
-
+def draw_type(buffer, type1, type2, x0=0, y0=0):
+    if type1:  # Hanya gambar type1 jika tidak None
+        buffer.put_line((x0, y0), f" {type1.upper()} ", fg=0, bg=type_colors.get(type1.lower(), 0))
+    if type2:  # Hanya gambar type2 jika tidak None
+        buffer.put_line((x0 + len(type1) + 2, y0), f" {type2.upper()} ", fg=0, bg=type_colors.get(type2.lower(), 0))
 
 def draw_flavor_text(buffer, text, width, x0=0, y0=0, fg=15, bg=-1):
     # Non-asian languages only!
@@ -135,4 +168,7 @@ def draw_evolutions(buffer, chain, number, x0=0, y0=0, bg=-1):
                 draw(e, evolutions[e], longest, ox0 + ox1, oy0 + oy1 * 2 + last)
                 last = get_height(evolutions[e]) - 2
 
-    draw(list(chain.keys())[0], list(chain.values())[0], 0, 0, 0)
+    # draw(chain.keys()[0], chain.values()[0], 0, 0, 0)
+    keys = list(chain.keys())  # Ubah dict_keys menjadi list
+    values = list(chain.values())  # Ubah dict_values menjadi list
+    draw(keys[0], values[0], 0, 0, 0)
