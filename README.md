@@ -32,12 +32,16 @@ Alternatively, you can clone the repository and install the required dependencie
 2. Install the required system dependencies (for Ubuntu/Debian):
    ```bash
    sudo apt-get update
-   sudo apt-get install -y python3-dev python3-pip libjpeg-dev zlib1g-dev
+   sudo apt-get install -y python3-dev python3-pip libjpeg-dev zlib1g-dev python3-venv
    ```
 
 3. Install the Python dependencies:
    ```bash
+   cd /path/to/pokedex-cli
+   python3 -m venv venv
+   source venv/bin/activate
    pip install -r requirements.txt
+   pip install -e .
    ```
 
 For the best output quality, please adjust the vertical line spacing in your terminal emulator until the block characters connect.
